@@ -1,18 +1,19 @@
 # Stage 1: Build the React app
-FROM node:14 AS frontend-builder
+FROM node:18-alpine AS  frontend-builder
+
 
 # Set the working directory
+RUN mkdir -p /app/frontend
 WORKDIR /app/frontend
 
 # Copy the package.json and package-lock.json files
 COPY frontend/package*.json ./
 
-# Install dependencies
-RUN npm install
-
 # Copy the rest of the frontend code
 COPY frontend/ ./
 
+# Install dependencies
+RUN npm install
 # Expose the port for the frontend
 EXPOSE 3000
 
@@ -21,7 +22,6 @@ CMD ["npm", "start"]
 # Stage 2: Set up the Python backend
 FROM python:3.11-slim AS backend
 
-# Set the working directory
 WORKDIR /app/backend
 
 # Copy the requirements file

@@ -23,10 +23,10 @@ class UAV:
         self.uav_id:int = uav_id
         self.buffer_polygon:Polygon = buffer_polygon
         self._internal_uav_coordinates:tuple[float,float,float] = uav_coordinates 
+        self.init_uav_coordinates:tuple[float,float,float] = uav_coordinates
         self.observers:list[object] = []
         self.interpolation_distance:int = interpolation_distance
         self.waypoints:list[tuple[float,float,float]] = generate_waypoints(self.buffer_polygon, uav_coordinates[:2], self.interpolation_distance)
-        self.used_waypoints:list[tuple[float,float,float]] = []
         self.update_cycle:int=0
         self._stop_event:threading.Event = threading.Event()
         self.start_moving()
@@ -54,11 +54,10 @@ class UAV:
         if (self.update_cycle > -1):
             if not self.waypoints:
                 print(f"UAV {self.uav_id} has no waypoints left.")
-                self.waypoints = self.used_waypoints
+                self.waypoints = generate_waypoints(self.buffer_polygon, self.init_uav_coordinates[:2], self.interpolation_distance)
                 return self._uav_coordinates
 
             next_waypoint = self.waypoints.pop(0)
-            self.used_waypoints.append(next_waypoint)
             self._uav_coordinates = [next_waypoint[0], next_waypoint[1], 500]
             print(f"UAV {self.uav_id} moved to new position: {next_waypoint}")
             self.update_cycle+=1
